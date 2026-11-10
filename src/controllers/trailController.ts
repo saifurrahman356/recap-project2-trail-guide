@@ -4,7 +4,7 @@ import { formatDate } from "./utils";
 
 export async function showTrails(_req: Request, res: Response) {
   const trails = await getAllTrails();
-  res.render("index.njk", { trails });
+  res.status(200).render("index.njk", { trails });
 }
 
 export async function showTrailBySlug(
@@ -16,7 +16,7 @@ export async function showTrailBySlug(
   const trail = await getTrailBySlug(slug);
 
   if (trail) {
-    res.render("trail.njk", {
+    res.status(200).render("trail.njk", {
       trail: {
         ...trail,
         createdAt: formatDate(trail.createdAt),
