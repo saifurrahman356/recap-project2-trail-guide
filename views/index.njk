@@ -1,7 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Home - Trail Guide{% endblock %}
+{% from "macros/trailCard.njk" import trailCard %}
 {% block content %}
-  <h1>Welcome to the Trail Guide</h1>
-  <p>Explore the best trails around you.</p>
-  <button>Test Pico.css</button>
+  <div class="trail-list">
+    {% for trail in trails %}
+      {{ trailCard(trail) }}
+    {% else %}
+      <p>No trails available at the moment.</p>
+    {% endfor %}
+  </div>
 {% endblock %}

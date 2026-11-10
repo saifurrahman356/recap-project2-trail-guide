@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <article>
+    <header>
+      <h1>{{ trail.title }}</h1>
+
+      <p>
+        <strong>Region:</strong>
+        {{ trail.regionName }}, {{ trail.regionCountry }}
+      </p>
+
+      <p>
+        <strong>Difficulty:</strong>
+        <span class="difficulty-badge difficulty-{{ trail.difficulty }}">
+          {{ trail.difficulty | capitalize }}
+        </span>
+      </p>
+
+      <p><strong>Distance:</strong> {{ trail.distanceKm }} km</p>
+    </header>
+
+    {% if trail.imageUrl %}
+      <figure>
+        <img
+          src="{{ trail.imageUrl }}"
+          alt="{{ trail.title }}"
+          style="width: 100%; height: auto;"
+        />
+      </figure>
+    {% endif %}
+
+    <section>
+      <h2>About this trail</h2>
+      <p>{{ trail.description | safe }}</p>
+    </section>
+
+    <footer>
+      <small> Added on: {{ trail.createdAt }} </small>
+    </footer>
+  </article>
+
+  <a href="/" role="button" class="secondary">Back to trails</a>
+{% endblock %}

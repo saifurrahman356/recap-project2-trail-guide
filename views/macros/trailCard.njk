@@ -1,0 +1,21 @@
+{% macro trailCard(trail) %}
+  <article>
+    <header>
+      <h2>{{ trail.title }}</h2>
+      <span class="difficulty-badge difficulty-{{ trail.difficulty }}">
+        {{ trail.difficulty | capitalize }}
+      </span>
+    </header>
+
+    <p><strong>Distance:</strong> {{ trail.distanceKm }} km</p>
+
+    <p>
+      <strong>Region:</strong>
+      {{ trail.regionName }}, {{ trail.regionCountry }}
+    </p>
+
+    <footer>
+      <a href="/trails/{{ trail.slug }}" role="button"> View trail </a>
+    </footer>
+  </article>
+{% endmacro %}

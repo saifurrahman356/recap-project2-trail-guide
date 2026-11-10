@@ -14,9 +14,10 @@ nunjucks.configure(viewDir, { autoescape: true, express: app, watch: true });
 app.set("view engine", "html");
 app.use(express.static(publicDir));
 
-app.get("/", (_req, res) => {
-  res.render("index.njk");
-});
+app.get("/", websiteRoutes);
+
+import websiteRoutes from "./routes/websiteRoutes";
+app.use("/", websiteRoutes);
 
 connectDB()
   .then(() => {
