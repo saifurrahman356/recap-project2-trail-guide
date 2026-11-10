@@ -1,6 +1,7 @@
 import express from "express";
 import path from "node:path";
 import nunjucks from "nunjucks";
+import { logger } from "./middleware/logger";
 
 import { connectDB, closeDB } from "./models/db";
 
@@ -13,6 +14,8 @@ const publicDir = path.resolve("public");
 nunjucks.configure(viewDir, { autoescape: true, express: app, watch: true });
 app.set("view engine", "html");
 app.use(express.static(publicDir));
+
+app.use(logger);
 
 app.get("/", websiteRoutes);
 
