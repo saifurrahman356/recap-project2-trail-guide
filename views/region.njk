@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "macros/trailCard.njk" import trailCard %}
+
+{% block content %}
+  <article>
+    <h1>{{ region.name }}</h1>
+
+    <p><strong>Country:</strong> {{ region.country }}</p>
+
+    {% if region.description %}
+      <p>{{ region.description }}</p>
+    {% endif %}
+  </article>
+
+  <section>
+    <h2>Trails in {{ region.name }}</h2>
+
+    <div class="trail-list">
+      {% for trail in trails %}
+        {{ trailCard(trail) }}
+      {% else %}
+        <p>No trails available in this region yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

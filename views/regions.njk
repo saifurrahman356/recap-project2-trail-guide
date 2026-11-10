@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Explore Regions</h1>
+
+  <div class="region-list">
+    {% for region in regions %}
+      <article>
+        <h2>
+          <a href="/regions/{{ region.slug }}"> {{ region.name }} </a>
+        </h2>
+
+        <p><strong>Country:</strong> {{ region.country }}</p>
+
+        {% if region.description %}
+          <p>{{ region.description | safe }}</p>
+        {% endif %}
+      </article>
+    {% else %}
+      <p>No regions available at the moment.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

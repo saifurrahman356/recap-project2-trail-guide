@@ -23,6 +23,11 @@ export async function showTrailBySlug(
       },
     });
   } else {
-    res.status(404).render("error/404.njk");
+    res.status(404).render("error/error.njk", {
+      errorTitle: "Trail Not Found",
+      errorMessage: "Sorry, the trail you are looking for does not exist.",
+      action: "/",
+      actionText: "Back to all trails",
+    });
   }
 }
