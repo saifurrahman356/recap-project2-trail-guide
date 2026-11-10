@@ -1,4 +1,8 @@
 {
+  "name": "recap-project2-trail-guide",
+  "version": "1.0.0",
+  "description": "",
+
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
