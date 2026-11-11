@@ -50,3 +50,9 @@ export async function getTrailsByRegionId(
     [regionId],
   );
 }
+
+export async function deleteTrailById(id: number): Promise<void> {
+  const db = await getDB();
+
+  await db.run(`DELETE FROM trails WHERE id = ?`, [id]);
+}

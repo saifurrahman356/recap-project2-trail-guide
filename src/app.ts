@@ -4,6 +4,8 @@ import nunjucks from "nunjucks";
 import { logger } from "./middleware/logger";
 
 import { connectDB, closeDB } from "./models/db";
+import websiteRoutes from "./routes/websiteRoutes";
+import adminRoutes from "./routes/adminRoutes";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -17,10 +19,8 @@ app.use(express.static(publicDir));
 
 app.use(logger);
 
-app.get("/", websiteRoutes);
-
-import websiteRoutes from "./routes/websiteRoutes";
 app.use("/", websiteRoutes);
+app.use("/admin", adminRoutes);
 
 connectDB()
   .then(() => {
