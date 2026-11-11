@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    {% if isEdit %}
+      Edit Trail
+    {% else %}
+      Create New Trail
+    {% endif %}
+  </h1>
+
+  <form
+    action="{% if isEdit %}/admin/trails/{{ trail.id }}/edit{% else %}/admin/trails{% endif %}"
+    method="POST"
+  >
+    <label for="title">Title</label>
+    <input
+      type="text"
+      id="title"
+      name="title"
+      value="{% if trail %}{{ trail.title }}{% endif %}"
+      required
+    />
+
+    <label for="regionId">Region</label>
+    <select id="regionId" name="regionId" required>
+      <option value="">Select a region</option>
+
+      {% for region in regions %}
+        <option
+          value="{{ region.id }}"
+          {% if trail and trail.regionId == region.id %}selected{% endif %}
+        >
+          {{ region.name }}, {{ region.country }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="difficulty">Difficulty</label>
+    <select id="difficulty" name="difficulty" required>
+      <option value="">Select difficulty</option>
+
+      <option
+        value="easy"
+        {% if trail and trail.difficulty == "easy" %}selected{% endif %}
+      >
+        Easy
+      </option>
+
+      <option
+        value="moderate"
+        {% if trail and trail.difficulty == "moderate" %}selected{% endif %}
+      >
+        Moderate
+      </option>
+
+      <option
+        value="hard"
+        {% if trail and trail.difficulty == "hard" %}selected{% endif %}
+      >
+        Hard
+      </option>
+    </select>
+
+    <label for="distanceKm">Distance (km)</label>
+    <input
+      type="number"
+      id="distanceKm"
+      name="distanceKm"
+      step="0.1"
+      min="0"
+      value="{% if trail %}{{ trail.distanceKm }}{% endif %}"
+      required
+    />
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description">
+    {% if trail and trail.description %}{{ trail.description | safe }}{% endif %}</textarea>
+
+    <label for="imageUrl">Image URL</label>
+    <input
+      type="url"
+      id="imageUrl"
+      name="imageUrl"
+      value="{% if trail and trail.imageUrl %}{{ trail.imageUrl }}{% endif %}"
+    />
+    <footer class="trail-actions">
+      <button type="submit">
+        {% if isEdit %}Update Trail{% else %}Create Trail{% endif %}
+      </button>
+      <a href="/admin" role="button" class="secondary"> Cancel </a>
+    </footer>
+  </form>
+{% endblock %}
