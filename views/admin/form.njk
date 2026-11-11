@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+```njk {% extends "base.html" %}
 
 {% block content %}
   <h1>
@@ -73,9 +73,13 @@
       required
     />
 
-    <label for="description">Description</label>
-    <textarea id="description" name="description">
-    {% if trail and trail.description %}{{ trail.description | safe }}{% endif %}</textarea>
+    <label for="description-editor">Description</label>
+
+    <div id="description-editor"></div>
+
+    <!-- This hidden input sends the description to Express -->
+    <textarea id="description" name="description" style="display:none;">
+    {{ trail.description if trail else '' }}</textarea>
 
     <label for="imageUrl">Image URL</label>
     <input
@@ -84,11 +88,18 @@
       name="imageUrl"
       value="{% if trail and trail.imageUrl %}{{ trail.imageUrl }}{% endif %}"
     />
+
     <footer class="trail-actions">
       <button type="submit">
         {% if isEdit %}Update Trail{% else %}Create Trail{% endif %}
       </button>
+
       <a href="/admin" role="button" class="secondary"> Cancel </a>
     </footer>
   </form>
+
+  <!-- Quill JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <script src="/js/trail-editor.js"></script>
 {% endblock %}
+```

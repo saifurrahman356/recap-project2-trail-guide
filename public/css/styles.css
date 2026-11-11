@@ -43,3 +43,155 @@
   background-color: #c62828;
   border-color: #c62828;
 }
+
+/* ================================
+   Quill Toolbar
+================================ */
+
+.ql-snow.ql-toolbar {
+  background: #252a33 !important;
+  border: 1px solid #555 !important;
+}
+
+/* Toolbar buttons */
+.ql-snow.ql-toolbar button {
+  background: transparent !important;
+  border: none !important;
+  color: #e5e7eb !important;
+  opacity: 1 !important;
+}
+
+/* Toolbar icons */
+.ql-snow.ql-toolbar button .ql-stroke {
+  stroke: #d1d5db !important;
+}
+
+.ql-snow.ql-toolbar button .ql-fill {
+  fill: #d1d5db !important;
+}
+
+/* Hover and active buttons */
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke {
+  stroke: #38bdf8 !important;
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill {
+  fill: #38bdf8 !important;
+}
+
+/* ================================
+   Dropdown
+================================ */
+
+.ql-snow .ql-picker {
+  color: #e5e7eb !important;
+}
+
+.ql-snow .ql-picker-label {
+  background: transparent !important;
+  color: #e5e7eb !important;
+  border: none !important;
+}
+
+.ql-snow .ql-picker-label:hover {
+  color: #38bdf8 !important;
+}
+
+.ql-snow .ql-picker-options {
+  background: #252a33 !important;
+  border: 1px solid #555 !important;
+}
+
+.ql-snow .ql-picker-item {
+  color: #e5e7eb !important;
+}
+
+.ql-snow .ql-picker-item:hover {
+  color: #38bdf8 !important;
+}
+
+/* Dropdown arrows */
+.ql-snow .ql-picker-label .ql-stroke {
+  stroke: #d1d5db !important;
+}
+
+/* ================================
+   Editor Container
+================================ */
+
+#description-editor {
+  background: #1b1f27;
+  color: #e5e7eb;
+  border: 1px solid #555;
+}
+
+/* Editor content */
+#description-editor .ql-editor {
+  min-height: 220px;
+  color: #e5e7eb;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Placeholder */
+#description-editor .ql-editor.ql-blank::before {
+  color: #9ca3af;
+}
+
+/* ================================
+   Heading Sizes
+================================ */
+
+/* Heading 1 */
+#description-editor .ql-editor h1 {
+  font-size: 1.2rem;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+/* Heading 2 */
+#description-editor .ql-editor h2 {
+  font-size: 1.3rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+/* Heading 3 */
+#description-editor .ql-editor h3 {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+/* Normal paragraph text */
+#description-editor .ql-editor p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ================================
+   Heading Dropdown Preview
+================================ */
+
+/* Increase heading dropdown width */
+.ql-snow .ql-picker.ql-header {
+  width: 130px !important;
+}
+
+/* Give the selected heading more space */
+.ql-snow .ql-picker.ql-header .ql-picker-label {
+  width: 130px !important;
+  padding-right: 25px !important;
+}
+
+/* Make dropdown options equally wide */
+.ql-snow .ql-picker.ql-header .ql-picker-options {
+  width: 130px !important;
+}
+
+/* Prevent heading names from being cut off */
+.ql-snow .ql-picker.ql-header .ql-picker-item::before {
+  white-space: nowrap;
+}
