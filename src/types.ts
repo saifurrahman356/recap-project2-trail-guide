@@ -6,8 +6,6 @@ export interface Region {
   description: string | null;
 }
 
-export type Difficulty = "easy" | "moderate" | "hard";
-
 export interface Trail {
   id: number;
   title: string;
@@ -20,7 +18,18 @@ export interface Trail {
   createdAt: number;
 }
 
+export type CreateTrail = Omit<Trail, "id">;
+export type UpdateTrail = Omit<CreateTrail, "createdAt">;
+
 export interface TrailWithRegionData extends Trail {
   regionName: string;
   regionCountry: string;
+}
+
+export const DIFFICULTIES = ["easy", "moderate", "hard"] as const;
+
+export type Difficulty = (typeof DIFFICULTIES)[number];
+
+export function isDifficulty(value: unknown): value is Difficulty {
+  return DIFFICULTIES.some((difficulty) => difficulty === value);
 }
