@@ -3,7 +3,7 @@
 {% block content %}
   <div class="trail-list">
     {% for trail in trails %}
-      {{ trailCard(trail) }}
+      {{ trailCard(trail, isAdmin) }}
     {% else %}
       <p>No trails available at the moment.</p>
     {% endfor %}

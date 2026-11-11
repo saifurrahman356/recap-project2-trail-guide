@@ -1,4 +1,4 @@
-{% macro trailCard(trail) %}
+{% macro trailCard(trail, isAdmin=false) %}
   <article>
     <header>
       <h2>{{ trail.title }}</h2>
@@ -14,8 +14,18 @@
       {{ trail.regionName }}, {{ trail.regionCountry }}
     </p>
 
-    <footer>
-      <a href="/trails/{{ trail.slug }}" role="button"> View trail </a>
+    <footer class="trail-actions">
+      <a href="/trails/{{ trail.slug }}" role="button">View trail</a>
+
+      {% if isAdmin %}
+        <form action="/admin/trails/{{ trail.id }}/delete" method="POST">
+          <button type="submit" class="delete-button">Delete</button>
+        </form>
+
+        <form action="/admin/trails/{{ trail.id }}/edit" method="GET">
+          <button type="submit">Edit</button>
+        </form>
+      {% endif %}
     </footer>
   </article>
 {% endmacro %}

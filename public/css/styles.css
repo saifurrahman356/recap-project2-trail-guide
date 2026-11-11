@@ -20,3 +20,26 @@
   background: #fee2e2;
   color: #991b1b;
 }
+
+.trail-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.trail-actions a,
+.trail-actions button {
+  width: 150px;
+  margin: 0;
+  text-align: center;
+}
+
+.trail-actions form {
+  margin: 0;
+}
+
+.delete-button {
+  background-color: #c62828;
+  border-color: #c62828;
+}
