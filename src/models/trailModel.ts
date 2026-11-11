@@ -69,6 +69,18 @@ export async function getTrailById(
   );
 }
 
+export async function getTrailsByRegionSlug(
+  slug: string,
+): Promise<TrailWithRegionData[]> {
+  const db = await getDB();
+
+  return db.all<TrailWithRegionData[]>(
+    `${TRAIL_REGIONS_JOIN_QUERY}
+     WHERE r.slug = ?`,
+    [slug],
+  );
+}
+
 export async function addTrail(data: CreateTrail): Promise<number> {
   const db = await getDB();
 

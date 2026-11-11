@@ -6,6 +6,7 @@ import { logger } from "./middleware/logger";
 import { connectDB, closeDB } from "./models/db";
 import websiteRoutes from "./routes/websiteRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import apiRoutes from "./routes/apiRoutes";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -22,6 +23,7 @@ app.use(logger);
 
 app.use("/", websiteRoutes);
 app.use("/admin", adminRoutes);
+app.use("/api", apiRoutes);
 
 connectDB()
   .then(() => {

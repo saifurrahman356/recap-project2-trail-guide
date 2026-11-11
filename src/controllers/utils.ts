@@ -60,3 +60,7 @@ export function isValidTrailUpdateInput(
 export function getTrimmedString(value: unknown): string | undefined {
   return typeof value === "string" ? value.trim() : undefined;
 }
+
+export function isValidSlug(slug: string): boolean {
+  return /^[a-z0-9-]+$/.test(slug);
+}
