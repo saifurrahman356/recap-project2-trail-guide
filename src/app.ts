@@ -16,6 +16,7 @@ const publicDir = path.resolve("public");
 nunjucks.configure(viewDir, { autoescape: true, express: app, watch: true });
 app.set("view engine", "html");
 app.use(express.static(publicDir));
+app.use(express.urlencoded({ extended: true }));
 
 app.use(logger);
 
