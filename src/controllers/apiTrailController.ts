@@ -8,7 +8,10 @@ import {
   deleteTrailById,
 } from "../models/trailModel";
 import { isValidSlug } from "./utils";
-import { prepareUpdateTrail, prepareNewTrail } from "../service/trailSerivce";
+import {
+  prepareUpdateTrail,
+  prepareNewTrail,
+} from "../service/trailPrepareSerivce";
 import { isDifficulty, TrailUpdateBodyRequest } from "../types";
 
 export const showTrails = async (req: Request, res: Response) => {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { sanitize } from "./sanitizeContent";
+import { sanitize } from "../service/sanitizeContentService";
 import { slugify } from "../models/utils";
 import {
   addTrail,
@@ -16,7 +16,7 @@ import {
   isValidTrailInput,
 } from "./utils";
 import { CreateTrail, Difficulty } from "../types";
-import { renderError } from "./errorHandler";
+import { renderError } from "../service/errorHandlerService";
 
 export async function showAllTrails(_req: Request, res: Response) {
   try {

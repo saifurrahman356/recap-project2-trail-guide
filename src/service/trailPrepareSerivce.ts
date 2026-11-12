@@ -1,6 +1,6 @@
 import { getTrailBySlug, getTrailById } from "../models/trailModel";
 import { slugify } from "../models/utils";
-import { sanitize } from "../controllers/sanitizeContent";
+import { sanitize } from "./sanitizeContentService";
 import { getTrimmedString } from "../controllers/utils";
 import {
   TrailUpdateBodyRequest,
