@@ -12,14 +12,14 @@ export interface Trail {
   slug: string;
   difficulty: Difficulty;
   distanceKm: number;
-  description: string | null;
-  imageUrl: string | null;
+  description?: string;
+  imageUrl?: string;
   regionId: number;
   createdAt: number;
 }
 
 export type CreateTrail = Omit<Trail, "id">;
-export type UpdateTrail = Omit<CreateTrail, "createdAt">;
+export type UpdateTrail = Partial<Omit<CreateTrail, "createdAt">>;
 
 export interface TrailWithRegionData extends Trail {
   regionName: string;
@@ -32,4 +32,29 @@ export type Difficulty = (typeof DIFFICULTIES)[number];
 
 export function isDifficulty(value: unknown): value is Difficulty {
   return DIFFICULTIES.some((difficulty) => difficulty === value);
+}
+
+export type TrailBodyRequest = {
+  title?: unknown;
+  regionId?: unknown;
+  difficulty?: unknown;
+  distanceKm?: unknown;
+  description?: unknown;
+  imageUrl?: unknown;
+};
+
+export type TrailUpdateBodyRequest = TrailBodyRequest;
+
+export interface PrepareNewTrailResult {
+  success: boolean;
+  statusCode: number;
+  errorMessage: string;
+  trail?: CreateTrail;
+}
+
+export interface PrepareUpdateTrailResult {
+  success: boolean;
+  statusCode: number;
+  errorMessage: string;
+  trail?: Partial<UpdateTrail>;
 }

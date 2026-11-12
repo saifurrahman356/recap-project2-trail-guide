@@ -21,3 +21,11 @@ export async function getRegionBySlug(
 
   return region;
 }
+
+export async function getRegionById(id: number): Promise<Region | undefined> {
+  const db = await getDB();
+  const region = await db.get<Region>("SELECT * FROM regions WHERE id = ?", [
+    id,
+  ]);
+  return region;
+}

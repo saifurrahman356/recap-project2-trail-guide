@@ -1,6 +1,15 @@
 import { Request, Response } from "express";
-import { getAllTrails, getTrailBySlug } from "../models/trailModel";
+import {
+  addTrail,
+  updateTrail,
+  getAllTrails,
+  getTrailById,
+  getTrailBySlug,
+  deleteTrailById,
+} from "../models/trailModel";
 import { isValidSlug } from "./utils";
+import { prepareUpdateTrail, prepareNewTrail } from "../service/trailSerivce";
+import { TrailUpdateBodyRequest } from "../types";
 
 export const showTrails = async (_req: Request, res: Response) => {
   try {
@@ -32,5 +41,84 @@ export const showTrail = async (
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: `Error fetching trail: ${slug}` });
+  }
+};
+
+export const createTrail = async (req: Request, res: Response) => {
+  try {
+    const trailPreparationResult = await prepareNewTrail(req.body);
+
+    if (!trailPreparationResult.success) {
+      return res.status(trailPreparationResult.statusCode).json({
+        error: trailPreparationResult.errorMessage,
+      });
+    }
+
+    if (!trailPreparationResult.trail) {
+      throw new Error("Failed to create trail: trail data is missing");
+    }
+
+    const addedTrailId = await addTrail(trailPreparationResult.trail);
+    const trail = await getTrailById(addedTrailId);
+    res.status(201).json(trail);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error creating trail" });
+  }
+};
+
+export const editTrail = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  try {
+    const trailId = Number(req.params.id);
+
+    const updatePreperationResult = await prepareUpdateTrail(
+      trailId,
+      req.body as TrailUpdateBodyRequest,
+    );
+
+    if (!updatePreperationResult.success || !updatePreperationResult.trail) {
+      return res.status(updatePreperationResult.statusCode).json({
+        success: false,
+        errorMessage: updatePreperationResult.errorMessage,
+      });
+    }
+
+    await updateTrail(trailId, updatePreperationResult.trail);
+
+    const updatedTrail = await getTrailById(trailId);
+
+    console.log("Updated trail:", updatedTrail);
+
+    return res.status(200).json(updatedTrail);
+  } catch (error) {
+    console.error("Failed to update trail:", error);
+
+    return res.status(500).json({
+      success: false,
+      errorMessage: "Sorry, there was an error updating the trail.",
+    });
+  }
+};
+
+export const deleteTrail = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  try {
+    const { id } = req.params;
+    const trail = await getTrailById(Number(id));
+    if (!trail) {
+      return res
+        .status(404)
+        .json({ message: `Trail to delete not found: ${id}` });
+    }
+    await deleteTrailById(Number(id));
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error deleting trail" });
   }
 };
