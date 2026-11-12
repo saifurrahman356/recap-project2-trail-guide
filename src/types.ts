@@ -67,3 +67,15 @@ export type TrailFilters = {
 
 export type TrailFiltersResult =
   { success: true; filters: TrailFilters } | { success: false; error: string };
+
+export interface PageInformation {
+  page: number;
+  pageSize: number;
+}
+
+export interface PaginatedTrails {
+  items: TrailWithRegionData[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

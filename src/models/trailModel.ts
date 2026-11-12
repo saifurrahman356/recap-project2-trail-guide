@@ -3,6 +3,8 @@ import type {
   CreateTrail,
   UpdateTrail,
   TrailFilters,
+  PageInformation,
+  PaginatedTrails,
 } from "../types";
 import { getDB } from "./db";
 
@@ -22,10 +24,17 @@ const TRAIL_REGIONS_JOIN_QUERY = `
   FROM trails t
   INNER JOIN regions r ON t.region_id = r.id
 `;
+const TRAIL_COUNT_QUERY = `
+  SELECT COUNT(*) as count
+  FROM trails t
+  INNER JOIN regions r ON t.region_id = r.id
+`;
+const DEFAULT_PAGE_INFORMATION: PageInformation = { page: 1, pageSize: 4 };
 
 export async function getAllTrails(
   filters: TrailFilters = {},
-): Promise<TrailWithRegionData[]> {
+  pageInformation: PageInformation = DEFAULT_PAGE_INFORMATION,
+): Promise<PaginatedTrails> {
   const db = await getDB();
 
   const conditions: string[] = [];
@@ -49,11 +58,33 @@ export async function getAllTrails(
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
+  const countQuery = `${TRAIL_COUNT_QUERY} ${whereClause}`;
+  const countResult = await db.get<{ count: number }>(countQuery, params);
+  const totalCount = countResult?.count ?? 0;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalCount / pageInformation.pageSize),
+  );
+  const currentPage = Math.max(1, Math.min(pageInformation.page, totalPages));
+
   const query = `${TRAIL_REGIONS_JOIN_QUERY}
      ${whereClause}
-     ORDER BY t.created_at DESC`;
+     ORDER BY t.created_at DESC
+     LIMIT ? OFFSET ?`;
 
-  return db.all<TrailWithRegionData[]>(query, params);
+  const trails = await db.all<TrailWithRegionData[]>(query, [
+    ...params,
+    pageInformation.pageSize,
+    (currentPage - 1) * pageInformation.pageSize,
+  ]);
+
+  return {
+    items: trails,
+    total: totalCount,
+    page: currentPage,
+    pageSize: pageInformation.pageSize,
+  };
 }
 
 export async function getTrailBySlug(

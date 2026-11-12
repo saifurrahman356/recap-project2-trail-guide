@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% from "macros/trailCard.njk" import trailCard %}
+
 {% block content %}
+  <h2>Total Trails: {{ totalTrails }}</h2>
   <div class="trail-list">
     {% for trail in trails %}
       {{ trailCard(trail, isAdmin) }}
@@ -8,4 +10,24 @@
       <p>No trails available at the moment.</p>
     {% endfor %}
   </div>
+
+  {% if totalPages > 1 %}
+    <nav aria-label="Pagination">
+      <ul>
+        {% if previousPageUrl %}
+          <li>
+            <a href="{{ previousPageUrl }}">Previous</a>
+          </li>
+        {% endif %}
+
+        <li>Page {{ currentPage }} of {{ totalPages }}</li>
+
+        {% if nextPageUrl %}
+          <li>
+            <a href="{{ nextPageUrl }}">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
 {% endblock %}

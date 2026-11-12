@@ -21,7 +21,7 @@ export function getTrailFilters(req: Request): TrailFiltersResult {
     };
   }
 
-  if (q !== undefined && (typeof q !== "string" || !q.trim())) {
+  if (q !== undefined && typeof q !== "string") {
     return {
       success: false,
       error: "Invalid search query.",

@@ -7,6 +7,7 @@ import {
   getTrailBySlug,
   deleteTrailById,
 } from "../models/trailModel";
+import { getPageInformation } from "../service/trailPaginationService";
 import { isValidSlug } from "../utils/utils";
 import {
   prepareUpdateTrail,
@@ -18,14 +19,21 @@ import { getTrailFilters } from "../service/trailFilterService";
 export const showTrails = async (req: Request, res: Response) => {
   try {
     const result = getTrailFilters(req);
+    const pageInformation = getPageInformation(req);
 
     if (!result.success) {
       return res.status(400).json({ message: result.error });
     }
 
-    const trails = await getAllTrails(result.filters);
+    const paginatedTrails = await getAllTrails(result.filters, pageInformation);
+    const trails = paginatedTrails.items;
 
-    return res.status(200).json(trails);
+    return res.status(200).json({
+      items: trails,
+      total: paginatedTrails.total,
+      page: pageInformation.page,
+      pageSize: pageInformation.pageSize,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -88,8 +96,6 @@ export const editTrail = async (
     console.log("Request body for update:", req.body);
 
     const trailId = Number(req.params.id);
-
-    console.log("Updating trail with ID:", trailId);
 
     const updatePreperationResult = await prepareUpdateTrail(
       trailId,

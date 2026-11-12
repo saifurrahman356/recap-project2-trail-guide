@@ -2,45 +2,21 @@ import { Request, Response } from "express";
 import {
   addTrail,
   deleteTrailById,
-  getAllTrails,
   getTrailById,
   updateTrail,
 } from "../models/trailModel";
+import { showPaginatedTrails } from "../service/trailPaginationService";
 import { getAllRegions } from "../models/regionModel";
 import { TrailUpdateBodyRequest } from "../types";
 import { renderError } from "../service/errorHandlerService";
-import { getTrailFilters } from "../service/trailFilterService";
+
 import {
   prepareNewTrail,
   prepareUpdateTrail,
 } from "../service/trailPrepareSerivce";
 
 export async function showAllTrails(req: Request, res: Response) {
-  try {
-    const result = getTrailFilters(req);
-
-    if (!result.success) {
-      return renderError(res, 400, "Invalid Filters", result.error);
-    }
-
-    const trails = await getAllTrails(result.filters);
-
-    return res.status(200).render("index.njk", {
-      trails,
-      q: result.filters.q ?? "",
-      showSearch: true,
-      isAdmin: true,
-    });
-  } catch (error) {
-    console.error(error);
-
-    return renderError(
-      res,
-      500,
-      "Failed to Fetch Trails",
-      "Sorry, there was an error fetching the trails.",
-    );
-  }
+  await showPaginatedTrails(req, res, true);
 }
 
 export async function deleteTrail(req: Request, res: Response) {
