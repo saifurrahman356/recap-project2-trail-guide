@@ -11,7 +11,6 @@
       href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
     />
 
-    <!-- Quill stylesheet -->
     <link
       href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css"
       rel="stylesheet"
@@ -24,12 +23,25 @@
         <ul>
           <li><strong>Trail Explorer</strong></li>
         </ul>
+
         <ul>
           <li><a href="/">Trails</a></li>
           <li><a href="/regions">Regions</a></li>
           <li><a href="/admin">Admin</a></li>
         </ul>
       </nav>
+      {% if showSearch %}
+        <form action="/" method="GET" role="search">
+          <input
+            type="search"
+            name="q"
+            placeholder="Search trails by title..."
+            value="{{ q or '' }}"
+            aria-label="Search trails"
+          />
+          <button type="submit">Search</button>
+        </form>
+      {% endif %}
     </header>
 
     <main class="container">{% block content %}{% endblock %}</main>
