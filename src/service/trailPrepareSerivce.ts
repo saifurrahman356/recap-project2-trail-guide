@@ -1,7 +1,7 @@
 import { getTrailBySlug, getTrailById } from "../models/trailModel";
-import { slugify } from "../models/utils";
+import { slugify } from "../utils/utils";
 import { sanitize } from "./sanitizeContentService";
-import { getTrimmedString } from "../controllers/utils";
+import { getTrimmedString } from "../utils/utils";
 import {
   TrailUpdateBodyRequest,
   PrepareUpdateTrailResult,
@@ -33,8 +33,6 @@ export async function prepareNewTrail(
     description: getTrimmedString(body.description),
     imageUrl: getTrimmedString(body.imageUrl),
   };
-
-  console.log("Prepared input:", input);
 
   if (!isValidCreateTrail(input)) {
     return {
@@ -138,8 +136,6 @@ export async function prepareUpdateTrail(
     imageUrl:
       body.imageUrl === undefined ? undefined : getTrimmedString(body.imageUrl),
   };
-
-  console.log("Prepared input for update:", input);
 
   if (!isValidUpdateTrail(input)) {
     return {

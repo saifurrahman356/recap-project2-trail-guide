@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { isValidSlug } from "./utils";
+import { isValidSlug } from "../utils/utils";
 import { getAllRegions } from "../models/regionModel";
 import { getTrailsByRegionSlug } from "../models/trailModel";
 

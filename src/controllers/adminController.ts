@@ -1,30 +1,40 @@
 import { Request, Response } from "express";
-import { sanitize } from "../service/sanitizeContentService";
-import { slugify } from "../models/utils";
 import {
   addTrail,
   deleteTrailById,
   getAllTrails,
   getTrailById,
-  getTrailBySlug,
   updateTrail,
 } from "../models/trailModel";
 import { getAllRegions } from "../models/regionModel";
-import {
-  getTrimmedString,
-  isValidTrailUpdateInput,
-  isValidTrailInput,
-} from "./utils";
-import { CreateTrail, Difficulty } from "../types";
+import { TrailUpdateBodyRequest } from "../types";
 import { renderError } from "../service/errorHandlerService";
+import { getTrailFilters } from "../service/trailFilterService";
+import {
+  prepareNewTrail,
+  prepareUpdateTrail,
+} from "../service/trailPrepareSerivce";
 
-export async function showAllTrails(_req: Request, res: Response) {
+export async function showAllTrails(req: Request, res: Response) {
   try {
-    const trails = await getAllTrails();
+    const result = getTrailFilters(req);
 
-    res.status(200).render("index.njk", { isAdmin: true, trails });
+    if (!result.success) {
+      return renderError(res, 400, "Invalid Filters", result.error);
+    }
+
+    const trails = await getAllTrails(result.filters);
+
+    return res.status(200).render("index.njk", {
+      trails,
+      q: result.filters.q ?? "",
+      showSearch: true,
+      isAdmin: true,
+    });
   } catch (error) {
-    renderError(
+    console.error(error);
+
+    return renderError(
       res,
       500,
       "Failed to Fetch Trails",
@@ -33,8 +43,8 @@ export async function showAllTrails(_req: Request, res: Response) {
   }
 }
 
-export async function deleteTrail(_req: Request, res: Response) {
-  const trailId = Number(_req.params.id);
+export async function deleteTrail(req: Request, res: Response) {
+  const trailId = Number(req.params.id);
 
   if (isNaN(trailId)) {
     renderError(res, 400, "Failed to Fetch Trail", "Not a valid trail ID.");
@@ -69,8 +79,8 @@ export async function showCreateTrailForm(_req: Request, res: Response) {
   }
 }
 
-export async function showEditTrailForm(_req: Request, res: Response) {
-  const trailId = Number(_req.params.id);
+export async function showEditTrailForm(req: Request, res: Response) {
+  const trailId = Number(req.params.id);
 
   if (isNaN(trailId)) {
     renderError(res, 400, "Failed to Fetch Trail", "Not a valid trail ID.");
@@ -102,82 +112,24 @@ export async function showEditTrailForm(_req: Request, res: Response) {
   }
 }
 
-export async function createNewTrail(_req: Request, res: Response) {
-  let { title, regionId, difficulty, distanceKm, description, imageUrl } =
-    _req.body;
-
-  title = getTrimmedString(title);
-  regionId = getTrimmedString(regionId);
-  difficulty = getTrimmedString(difficulty);
-  distanceKm = getTrimmedString(distanceKm);
-  description = getTrimmedString(description);
-  imageUrl = getTrimmedString(imageUrl);
-
-  if (
-    !isValidTrailInput(
-      title,
-      regionId,
-      difficulty,
-      distanceKm,
-      description,
-      imageUrl,
-    )
-  ) {
-    console.error("Invalid trail input:", {
-      title,
-      regionId,
-      difficulty,
-      distanceKm,
-      description,
-      imageUrl,
-    });
-    res.status(400).render("error/error.njk", {
-      errorTitle: "Failed to Create Trail",
-      errorMessage: "Invalid input. Please fill in all required fields.",
-      action: "/admin",
-      actionText: "Back to all trails",
-    });
-    return;
-  }
-
-  const newTrail = {
-    title,
-    regionId: Number(regionId),
-    difficulty,
-    distanceKm: Number(distanceKm),
-    description: description !== undefined ? sanitize(description) : "",
-    imageUrl,
-    createdAt: Math.floor(Date.now() / 1000),
-    slug: slugify(title ?? ""),
-  };
-
-  if (newTrail.slug === "") {
-    console.error("Failed to create new trail: slug is empty");
-    renderError(
-      res,
-      400,
-      "Failed to Create Trail",
-      "Invalid input. Please fill in all required fields.",
-    );
-    return;
-  }
-
-  if (newTrail.title !== "") {
-    const existingTrailWithSlug = await getTrailBySlug(newTrail.slug);
-    if (existingTrailWithSlug) {
-      console.error("Failed to create new trail: slug already exists");
-      renderError(
-        res,
-        400,
-        "Failed to Create Trail",
-        "A trail with this title already exists.",
-      );
-      return;
-    }
-  }
-
+export async function createNewTrail(req: Request, res: Response) {
   try {
-    await addTrail(newTrail);
+    const trailPreparationResult = await prepareNewTrail(req.body);
+
+    if (!trailPreparationResult.success) {
+      return renderError(
+        res,
+        trailPreparationResult.statusCode,
+        "Failed to Create Trail",
+        trailPreparationResult.errorMessage,
+      );
+    }
+
+    if (!trailPreparationResult.trail) {
+      throw new Error("Failed to create trail: trail data is missing");
+    }
+
+    await addTrail(trailPreparationResult.trail);
     res.redirect("/admin");
   } catch (error) {
     console.error("Failed to create new trail:", error);
@@ -192,88 +144,23 @@ export async function createNewTrail(_req: Request, res: Response) {
 
 export async function editTrail(req: Request, res: Response) {
   try {
-    const title = getTrimmedString(req.body.title);
-    const regionId = getTrimmedString(req.body.regionId);
-    const difficulty = getTrimmedString(req.body.difficulty);
-    const distanceKm = getTrimmedString(req.body.distanceKm);
-    const description = getTrimmedString(req.body.description);
-    const imageUrl = getTrimmedString(req.body.imageUrl);
-
     const trailId = Number(req.params.id);
 
-    if (!Number.isInteger(trailId) || trailId <= 0) {
-      console.error("Invalid trail ID:", trailId);
+    const updatePreperationResult = await prepareUpdateTrail(
+      trailId,
+      req.body as TrailUpdateBodyRequest,
+    );
+
+    if (!updatePreperationResult.success || !updatePreperationResult.trail) {
       return renderError(
         res,
-        400,
+        updatePreperationResult.statusCode,
         "Failed to Update Trail",
-        "Not a valid trail ID.",
+        updatePreperationResult.errorMessage,
       );
     }
 
-    const existingTrail = await getTrailById(trailId);
-
-    if (!existingTrail) {
-      return renderError(
-        res,
-        404,
-        "Failed to Update Trail",
-        "Trail not found.",
-      );
-    }
-
-    if (
-      !isValidTrailUpdateInput(
-        title,
-        regionId,
-        difficulty,
-        distanceKm,
-        description,
-        imageUrl,
-      )
-    ) {
-      console.error("Invalid trail update input:", {
-        title,
-        regionId,
-        difficulty,
-        distanceKm,
-        description,
-        imageUrl,
-      });
-      return renderError(
-        res,
-        400,
-        "Failed to Update Trail",
-        "Invalid input. Please fill in all required fields.",
-      );
-    }
-
-    const updatedTrailData: Partial<CreateTrail> = {
-      title,
-      regionId: Number(regionId),
-      difficulty: difficulty as Difficulty,
-      distanceKm: Number(distanceKm),
-      description:
-        description !== undefined ? sanitize(description) : undefined,
-      imageUrl,
-      slug: title ? slugify(title) : undefined,
-    };
-
-    if (updatedTrailData.slug && existingTrail.slug !== updatedTrailData.slug) {
-      const existingTrailWithSlug = await getTrailBySlug(updatedTrailData.slug);
-
-      if (existingTrailWithSlug) {
-        return renderError(
-          res,
-          400,
-          "Failed to Update Trail",
-          "Slug already exists for another trail.",
-          `/admin/trails/${trailId}/edit`,
-          "Back to edit trail",
-        );
-      }
-    }
-
+    const updatedTrailData = updatePreperationResult.trail;
     await updateTrail(trailId, updatedTrailData);
 
     return res.redirect("/admin");

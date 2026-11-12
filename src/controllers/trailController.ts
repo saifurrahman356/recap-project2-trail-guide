@@ -1,10 +1,34 @@
 import type { Request, Response } from "express";
 import { getAllTrails, getTrailBySlug } from "../models/trailModel";
-import { formatDate } from "./utils";
+import { getTrailFilters } from "../service/trailFilterService";
+import { renderError } from "../service/errorHandlerService";
+import { formatDate } from "../utils/utils";
 
-export async function showTrails(_req: Request, res: Response) {
-  const trails = await getAllTrails();
-  res.status(200).render("index.njk", { trails });
+export async function showTrails(req: Request, res: Response) {
+  try {
+    const result = getTrailFilters(req);
+
+    if (!result.success) {
+      return renderError(res, 400, "Invalid Filters", result.error);
+    }
+
+    const trails = await getAllTrails(result.filters);
+
+    return res.status(200).render("index.njk", {
+      trails,
+      q: result.filters.q ?? "",
+      showSearch: true,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return renderError(
+      res,
+      500,
+      "Failed to Fetch Trails",
+      "Sorry, there was an error fetching the trails.",
+    );
+  }
 }
 
 export async function showTrailBySlug(
@@ -23,11 +47,13 @@ export async function showTrailBySlug(
       },
     });
   } else {
-    res.status(404).render("error/error.njk", {
-      errorTitle: "Trail Not Found",
-      errorMessage: "Sorry, the trail you are looking for does not exist.",
-      action: "/",
-      actionText: "Back to all trails",
-    });
+    return renderError(
+      res,
+      404,
+      "Trail Not Found",
+      "Sorry, the trail you are looking for does not exist.",
+      "/",
+      "Back to all trails",
+    );
   }
 }

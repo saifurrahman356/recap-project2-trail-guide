@@ -64,3 +64,6 @@ export type TrailFilters = {
   difficulty?: Difficulty;
   q?: string;
 };
+
+export type TrailFiltersResult =
+  { success: true; filters: TrailFilters } | { success: false; error: string };
