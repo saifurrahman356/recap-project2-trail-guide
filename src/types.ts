@@ -58,3 +58,9 @@ export interface PrepareUpdateTrailResult {
   errorMessage: string;
   trail?: Partial<UpdateTrail>;
 }
+
+export type TrailFilters = {
+  region?: string;
+  difficulty?: Difficulty;
+  q?: string;
+};

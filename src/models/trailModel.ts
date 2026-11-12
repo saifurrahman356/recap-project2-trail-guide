@@ -1,4 +1,9 @@
-import type { TrailWithRegionData, CreateTrail, UpdateTrail } from "../types";
+import type {
+  TrailWithRegionData,
+  CreateTrail,
+  UpdateTrail,
+  TrailFilters,
+} from "../types";
 import { getDB } from "./db";
 
 const TRAIL_REGIONS_JOIN_QUERY = `
@@ -18,13 +23,37 @@ const TRAIL_REGIONS_JOIN_QUERY = `
   INNER JOIN regions r ON t.region_id = r.id
 `;
 
-export async function getAllTrails(): Promise<TrailWithRegionData[]> {
+export async function getAllTrails(
+  filters: TrailFilters = {},
+): Promise<TrailWithRegionData[]> {
   const db = await getDB();
 
-  return db.all<TrailWithRegionData[]>(
-    `${TRAIL_REGIONS_JOIN_QUERY}
-     ORDER BY t.created_at DESC`,
-  );
+  const conditions: string[] = [];
+  const params: any[] = [];
+
+  if (filters.region) {
+    conditions.push("r.slug = ?");
+    params.push(filters.region);
+  }
+
+  if (filters.difficulty) {
+    conditions.push("t.difficulty = ?");
+    params.push(filters.difficulty);
+  }
+
+  if (filters.q) {
+    conditions.push("t.title LIKE ?");
+    params.push(`%${filters.q}%`);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const query = `${TRAIL_REGIONS_JOIN_QUERY}
+     ${whereClause}
+     ORDER BY t.created_at DESC`;
+
+  return db.all<TrailWithRegionData[]>(query, params);
 }
 
 export async function getTrailBySlug(

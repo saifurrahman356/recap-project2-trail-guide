@@ -9,12 +9,36 @@ import {
 } from "../models/trailModel";
 import { isValidSlug } from "./utils";
 import { prepareUpdateTrail, prepareNewTrail } from "../service/trailSerivce";
-import { TrailUpdateBodyRequest } from "../types";
+import { isDifficulty, TrailUpdateBodyRequest } from "../types";
 
-export const showTrails = async (_req: Request, res: Response) => {
+export const showTrails = async (req: Request, res: Response) => {
   try {
-    const trails = await getAllTrails();
-    res.json({ trails });
+    const { region, difficulty, q } = req.query;
+
+    if (
+      difficulty !== undefined &&
+      (typeof difficulty !== "string" || !isDifficulty(difficulty))
+    ) {
+      return res
+        .status(400)
+        .json({ message: `Invalid difficulty: ${difficulty}` });
+    }
+
+    if (region !== undefined && (typeof region !== "string" || region === "")) {
+      return res.status(400).json({ message: `Invalid region: ${region}` });
+    }
+
+    if (q !== undefined && (typeof q !== "string" || q === "")) {
+      return res.status(400).json({ message: `Invalid query: q=${q}` });
+    }
+
+    const trails = await getAllTrails({
+      region: region,
+      difficulty: difficulty,
+      q: q,
+    });
+
+    res.json(trails);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching trails" });
@@ -37,7 +61,7 @@ export const showTrail = async (
       return res.status(404).json({ message: `Trail not found: ${slug}` });
     }
 
-    res.json({ trail });
+    res.json(trail);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: `Error fetching trail: ${slug}` });
