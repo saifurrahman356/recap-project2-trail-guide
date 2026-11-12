@@ -19,6 +19,7 @@ app.set("view engine", "html");
 app.use(express.static(publicDir));
 app.use(express.urlencoded({ extended: true }));
 
+app.use(express.json());
 app.use(logger);
 
 app.use("/", websiteRoutes);
