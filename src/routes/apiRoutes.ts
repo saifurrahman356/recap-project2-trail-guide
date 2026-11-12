@@ -22,5 +22,6 @@ router.use(apiKeyMiddleware);
 router.post("/trails", createTrail);
 router.put("/trails/:id", editTrail);
 router.delete("/trails/:id", deleteTrail);
+router.patch("/trails/:id", editTrail);
 
 export default router;
