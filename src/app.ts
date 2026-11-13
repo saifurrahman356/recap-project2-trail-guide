@@ -7,6 +7,7 @@ import { connectDB, closeDB } from "./models/db";
 import websiteRoutes from "./routes/websiteRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import apiRoutes from "./routes/apiRoutes";
+import { rateLimitMiddleware } from "./middleware/rateLimitMiddleware";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -18,6 +19,7 @@ nunjucks.configure(viewDir, { autoescape: true, express: app, watch: true });
 app.set("view engine", "html");
 app.use(express.static(publicDir));
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimitMiddleware);
 
 app.use(express.json());
 app.use(logger);

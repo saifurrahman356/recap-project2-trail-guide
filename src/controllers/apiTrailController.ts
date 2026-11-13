@@ -103,8 +103,6 @@ export const editTrail = async (
   res: Response,
 ) => {
   try {
-    console.log("Request body for update:", req.body);
-
     const trailId = Number(req.params.id);
 
     const updatePreperationResult = await prepareUpdateTrail(
