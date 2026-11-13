@@ -16,6 +16,7 @@ export interface Trail {
   imageUrl?: string;
   regionId: number;
   createdAt: number;
+  tagIds?: number[];
 }
 
 export type CreateTrail = Omit<Trail, "id">;
@@ -41,6 +42,7 @@ export type TrailBodyRequest = {
   distanceKm?: unknown;
   description?: unknown;
   imageUrl?: unknown;
+  tagIds?: unknown;
 };
 
 export type TrailUpdateBodyRequest = TrailBodyRequest;
@@ -78,4 +80,9 @@ export interface PaginatedTrails {
   total: number;
   page: number;
   pageSize: number;
+}
+
+export interface Tag {
+  id: number;
+  name: string;
 }

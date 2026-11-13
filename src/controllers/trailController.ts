@@ -3,6 +3,7 @@ import { getTrailBySlug } from "../models/trailModel";
 import { showPaginatedTrails } from "../service/trailPaginationService";
 import { renderError } from "../service/errorHandlerService";
 import { formatDate } from "../utils/utils";
+import { getAllTagsForTrail } from "../models/tagModel";
 
 export async function showTrails(req: Request, res: Response) {
   await showPaginatedTrails(req, res, false);
@@ -17,10 +18,12 @@ export async function showTrailBySlug(
   const trail = await getTrailBySlug(slug);
 
   if (trail) {
+    const trailTags = await getAllTagsForTrail(trail.id);
     res.status(200).render("trail.njk", {
       trail: {
         ...trail,
         createdAt: formatDate(trail.createdAt),
+        tags: trailTags,
       },
     });
   } else {

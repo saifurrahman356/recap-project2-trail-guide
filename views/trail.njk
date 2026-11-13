@@ -18,6 +18,18 @@
       </p>
 
       <p><strong>Distance:</strong> {{ trail.distanceKm }} km</p>
+
+      {% if trail.tags and trail.tags.length %}
+        <div class="trail-tags">
+          <strong>Tags:</strong>
+
+          <div class="tag-list">
+            {% for tag in trail.tags %}
+              <span class="tag">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     </header>
 
     {% if trail.imageUrl %}

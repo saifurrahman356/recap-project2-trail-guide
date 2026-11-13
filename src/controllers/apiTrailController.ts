@@ -15,6 +15,7 @@ import {
 } from "../service/trailPrepareSerivce";
 import { TrailUpdateBodyRequest } from "../types";
 import { getTrailFilters } from "../service/trailFilterService";
+import { getAllTagsForTrail } from "../models/tagModel";
 
 export const showTrails = async (req: Request, res: Response) => {
   try {
@@ -31,8 +32,8 @@ export const showTrails = async (req: Request, res: Response) => {
     return res.status(200).json({
       items: trails,
       total: paginatedTrails.total,
-      page: pageInformation.page,
-      pageSize: pageInformation.pageSize,
+      page: paginatedTrails.page,
+      pageSize: paginatedTrails.pageSize,
     });
   } catch (error) {
     console.error(error);
@@ -58,7 +59,10 @@ export const showTrail = async (
       return res.status(404).json({ message: `Trail not found: ${slug}` });
     }
 
-    res.json(trail);
+    const trailId = trail.id;
+    const trailTags = await getAllTagsForTrail(trailId);
+
+    res.json({ ...trail, tags: trailTags });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: `Error fetching trail: ${slug}` });
@@ -81,7 +85,13 @@ export const createTrail = async (req: Request, res: Response) => {
 
     const addedTrailId = await addTrail(trailPreparationResult.trail);
     const trail = await getTrailById(addedTrailId);
-    res.status(201).json(trail);
+    if (!trail) {
+      throw new Error("Failed to create trail: trail not found after creation");
+    }
+
+    const trailTags = await getAllTagsForTrail(addedTrailId);
+
+    res.status(201).json({ ...trail, tags: trailTags });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error creating trail" });
@@ -113,7 +123,9 @@ export const editTrail = async (
 
     const updatedTrail = await getTrailById(trailId);
 
-    return res.status(200).json(updatedTrail);
+    const updatedTrailTags = await getAllTagsForTrail(trailId);
+
+    return res.status(200).json({ ...updatedTrail, tags: updatedTrailTags });
   } catch (error) {
     console.error("Failed to update trail:", error);
 

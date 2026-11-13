@@ -23,7 +23,8 @@ export function isValidCreateTrail(
     Number(input.distanceKm) > 0 &&
     (input.description === undefined ||
       typeof input.description === "string") &&
-    (input.imageUrl === undefined || typeof input.imageUrl === "string")
+    (input.imageUrl === undefined || typeof input.imageUrl === "string") &&
+    (input.tagIds === undefined || Array.isArray(input.tagIds))
   );
 }
 
@@ -53,6 +54,7 @@ export function isValidUpdateTrail(
         Number(input.distanceKm) > 0)) &&
     (input.description === undefined ||
       typeof input.description === "string") &&
-    (input.imageUrl === undefined || typeof input.imageUrl === "string")
+    (input.imageUrl === undefined || typeof input.imageUrl === "string") &&
+    (input.tagIds === undefined || Array.isArray(input.tagIds))
   );
 }

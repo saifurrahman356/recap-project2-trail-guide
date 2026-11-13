@@ -1,4 +1,4 @@
-```njk {% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
   <h1>
@@ -72,6 +72,23 @@
       value="{% if trail %}{{ trail.distanceKm }}{% endif %}"
       required
     />
+    <label>Tags</label>
+
+    <input type="hidden" name="tagIds" value="" />
+
+    <fieldset class="tag-checkboxes">
+      {% for tag in tags %}
+        <label class="tag-option">
+          <input
+            type="checkbox"
+            name="tagIds"
+            value="{{ tag.id }}"
+            {% if trail and tag.id in trail.tagIds %}checked{% endif %}
+          />
+          <span>{{ tag.name }}</span>
+        </label>
+      {% endfor %}
+    </fieldset>
 
     <label for="description-editor">Description</label>
 
@@ -102,4 +119,3 @@
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
   <script src="/js/trail-editor.js"></script>
 {% endblock %}
-```

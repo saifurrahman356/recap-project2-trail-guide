@@ -9,6 +9,7 @@ import { showPaginatedTrails } from "../service/trailPaginationService";
 import { getAllRegions } from "../models/regionModel";
 import { TrailUpdateBodyRequest } from "../types";
 import { renderError } from "../service/errorHandlerService";
+import { getAllTagsForTrail, getTags } from "../models/tagModel";
 
 import {
   prepareNewTrail,
@@ -44,7 +45,8 @@ export async function deleteTrail(req: Request, res: Response) {
 export async function showCreateTrailForm(_req: Request, res: Response) {
   try {
     const regions = await getAllRegions();
-    res.status(200).render("admin/form.njk", { regions, isEdit: false });
+    const tags = await getTags();
+    res.status(200).render("admin/form.njk", { regions, tags, isEdit: false });
   } catch (error) {
     renderError(
       res,
@@ -77,7 +79,12 @@ export async function showEditTrailForm(req: Request, res: Response) {
       return;
     }
 
-    res.status(200).render("admin/form.njk", { trail, regions, isEdit: true });
+    const tags = await getTags();
+    const tagIds = (await getAllTagsForTrail(trailId)).map((tag) => tag.id);
+    trail.tagIds = tagIds;
+    res
+      .status(200)
+      .render("admin/form.njk", { trail, regions, tags, isEdit: true, tagIds });
   } catch (error) {
     renderError(
       res,

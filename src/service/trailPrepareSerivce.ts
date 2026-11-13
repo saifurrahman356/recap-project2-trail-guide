@@ -32,6 +32,11 @@ export async function prepareNewTrail(
     distanceKm: Number(body.distanceKm),
     description: getTrimmedString(body.description),
     imageUrl: getTrimmedString(body.imageUrl),
+    tagIds: Array.isArray(body.tagIds)
+      ? body.tagIds.map(Number)
+      : body.tagIds
+        ? [Number(body.tagIds)]
+        : [],
   };
 
   if (!isValidCreateTrail(input)) {
@@ -78,6 +83,7 @@ export async function prepareNewTrail(
     distanceKm: Number(input.distanceKm),
     description: input.description ? sanitize(input.description) : "",
     imageUrl: input.imageUrl,
+    tagIds: input.tagIds,
     createdAt: Math.floor(Date.now() / 1000),
     slug,
   };
@@ -135,6 +141,14 @@ export async function prepareUpdateTrail(
         : getTrimmedString(body.description),
     imageUrl:
       body.imageUrl === undefined ? undefined : getTrimmedString(body.imageUrl),
+    tagIds:
+      body.tagIds === undefined
+        ? undefined
+        : Array.isArray(body.tagIds)
+          ? body.tagIds.filter(Boolean).map(Number)
+          : body.tagIds
+            ? [Number(body.tagIds)]
+            : [],
   };
 
   if (!isValidUpdateTrail(input)) {
@@ -202,6 +216,10 @@ export async function prepareUpdateTrail(
 
   if (input.imageUrl !== undefined) {
     updatedTrail.imageUrl = input.imageUrl;
+  }
+
+  if (input.tagIds !== undefined) {
+    updatedTrail.tagIds = input.tagIds;
   }
 
   return {

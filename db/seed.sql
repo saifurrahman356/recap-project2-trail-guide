@@ -1,7 +1,10 @@
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS trail_tags;
 DROP TABLE IF EXISTS trails;
 DROP TABLE IF EXISTS regions;
+DROP TABLE IF EXISTS tags;
+
 
 CREATE TABLE regions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,6 +27,20 @@ CREATE TABLE trails (
   FOREIGN KEY (region_id) REFERENCES regions(id)
 );
 
+CREATE TABLE tags (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE trail_tags (
+  trail_id INTEGER NOT NULL,
+  tag_id INTEGER NOT NULL,
+  PRIMARY KEY (trail_id, tag_id),
+  FOREIGN KEY (trail_id) REFERENCES trails(id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+);
+
+
 INSERT INTO regions (name, slug, country, description) VALUES
   ('Bavarian Alps', 'bavarian-alps', 'Germany', 'A stretch of the Northern Limestone Alps shared with Austria, known for limestone peaks and alpine meadows.'),
   ('Scottish Highlands', 'scottish-highlands', 'United Kingdom', 'A mountainous region covering the northern half of Scotland, full of glens, lochs, and coastal moors.'),
@@ -36,3 +53,21 @@ INSERT INTO trails (region_id, title, slug, difficulty, distance_km, description
   (2, 'Ben Nevis Mountain Track', 'ben-nevis-mountain-track', 'hard', 17.0, '<p>The standard route up the highest mountain in the British Isles. A long sustained climb that should not be underestimated in poor weather.</p>', 'https://images.unsplash.com/photo-1454942901704-3c44c11b2ad1', 1733000000),
   (3, 'Tre Cime di Lavaredo Loop', 'tre-cime-di-lavaredo-loop', 'moderate', 10.0, '<p>A circular hike around the three iconic peaks. Mostly on well-graded paths with continuously changing views of the rock walls.</p>', 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b', 1734000000),
   (3, 'Seceda Ridgeline', 'seceda-ridgeline', 'easy', 6.5, '<p>An easy walk along an exposed grassy ridge above Ortisei with sweeping views of the Odle group. Reachable by cable car.</p>', 'https://images.unsplash.com/photo-1519681393784-d120267933ba', 1735000000);
+
+INSERT INTO tags (name) VALUES
+  ('scenic'),
+  ('historical'),
+  ('challenging'),
+  ('family-friendly');
+
+INSERT INTO trail_tags (trail_id, tag_id) VALUES 
+  (1, 1),
+  (1, 4),
+  (2, 1),
+  (2, 3),
+  (3, 1),
+  (3, 4),
+  (4, 3),
+  (5, 1),
+  (5, 4),
+  (6, 1);

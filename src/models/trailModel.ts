@@ -7,6 +7,7 @@ import type {
   PaginatedTrails,
 } from "../types";
 import { getDB } from "./db";
+import { saveTagsForTrail } from "./tagModel";
 
 const TRAIL_REGIONS_JOIN_QUERY = `
   SELECT
@@ -144,22 +145,32 @@ export async function getTrailsByRegionSlug(
 export async function addTrail(data: CreateTrail): Promise<number> {
   const db = await getDB();
 
-  const result = await db.run(
-    `INSERT INTO trails (title, slug, difficulty, distance_km, description, image_url, region_id, created_at)
-     VALUES (@title, @slug, @difficulty, @distance_km, @description, @image_url, @region_id, @created_at)`,
-    {
-      "@title": data.title,
-      "@slug": data.slug,
-      "@difficulty": data.difficulty,
-      "@distance_km": data.distanceKm,
-      "@description": data.description,
-      "@image_url": data.imageUrl,
-      "@region_id": data.regionId,
-      "@created_at": data.createdAt,
-    },
-  );
+  try {
+    await db.run("BEGIN TRANSACTION");
+    const result = await db.run(
+      `INSERT INTO trails (title, slug, difficulty, distance_km, description, image_url, region_id, created_at)
+       VALUES (@title, @slug, @difficulty, @distance_km, @description, @image_url, @region_id, @created_at)`,
+      {
+        "@title": data.title,
+        "@slug": data.slug,
+        "@difficulty": data.difficulty,
+        "@distance_km": data.distanceKm,
+        "@description": data.description,
+        "@image_url": data.imageUrl,
+        "@region_id": data.regionId,
+        "@created_at": data.createdAt,
+      },
+    );
 
-  return result.lastID!;
+    const trailId = result.lastID!;
+    await saveTagsForTrail(trailId, data.tagIds ?? []);
+
+    await db.run("COMMIT");
+    return trailId;
+  } catch (error) {
+    await db.run("ROLLBACK");
+    throw new Error(`Failed to add trail: ${error}`);
+  }
 }
 
 export async function updateTrail(
@@ -168,8 +179,10 @@ export async function updateTrail(
 ): Promise<void> {
   const db = await getDB();
 
-  await db.run(
-    `UPDATE trails
+  try {
+    await db.run("BEGIN TRANSACTION");
+    await db.run(
+      `UPDATE trails
      SET title = COALESCE(@title, title),
          slug = COALESCE(@slug, slug),
          difficulty = COALESCE(@difficulty, difficulty),
@@ -184,17 +197,26 @@ export async function updateTrail(
          END,
          region_id = COALESCE(@region_id, region_id)
      WHERE id = @id`,
-    {
-      "@id": id,
-      "@title": data.title ?? null,
-      "@slug": data.slug ?? null,
-      "@difficulty": data.difficulty ?? null,
-      "@distance_km": data.distanceKm ?? null,
-      "@description": data.description ?? null,
-      "@update_description": data.description !== undefined ? 1 : 0,
-      "@image_url": data.imageUrl ?? null,
-      "@update_image_url": data.imageUrl !== undefined ? 1 : 0,
-      "@region_id": data.regionId ?? null,
-    },
-  );
+      {
+        "@id": id,
+        "@title": data.title ?? null,
+        "@slug": data.slug ?? null,
+        "@difficulty": data.difficulty ?? null,
+        "@distance_km": data.distanceKm ?? null,
+        "@description": data.description ?? null,
+        "@update_description": data.description !== undefined ? 1 : 0,
+        "@image_url": data.imageUrl ?? null,
+        "@update_image_url": data.imageUrl !== undefined ? 1 : 0,
+        "@region_id": data.regionId ?? null,
+      },
+    );
+
+    if (data.tagIds !== undefined) {
+      await saveTagsForTrail(id, data.tagIds);
+    }
+    await db.run("COMMIT");
+  } catch (error) {
+    await db.run("ROLLBACK");
+    throw new Error(`Failed to update trail: ${error}`);
+  }
 }
