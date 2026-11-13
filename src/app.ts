@@ -19,14 +19,13 @@ nunjucks.configure(viewDir, { autoescape: true, express: app, watch: true });
 app.set("view engine", "html");
 app.use(express.static(publicDir));
 app.use(express.urlencoded({ extended: true }));
-app.use(rateLimitMiddleware);
 
 app.use(express.json());
 app.use(logger);
 
 app.use("/", websiteRoutes);
 app.use("/admin", adminRoutes);
-app.use("/api", apiRoutes);
+app.use("/api", rateLimitMiddleware, apiRoutes);
 
 connectDB()
   .then(() => {
