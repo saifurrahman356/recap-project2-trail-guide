@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "bun --watch --check src/app.ts",
     "typecheck": "bun check",
+    "start": "bun src/app.ts",
     "db:seed": "sqlite3 db/trail-guide.db < db/seed.sql"
   },
   "keywords": [],
