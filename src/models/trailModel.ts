@@ -162,8 +162,12 @@ export async function addTrail(data: CreateTrail): Promise<number> {
       },
     );
 
+    console.log(`Added trail with ID: ${result.lastID}`);
+
     const trailId = result.lastID!;
     await saveTagsForTrail(trailId, data.tagIds ?? []);
+
+    console.log(`Saved tags for trail with ID: ${trailId}`);
 
     await db.run("COMMIT");
     return trailId;

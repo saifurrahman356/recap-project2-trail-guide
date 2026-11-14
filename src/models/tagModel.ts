@@ -28,4 +28,5 @@ export async function saveTagsForTrail(
       tagId,
     ]);
   }
+  console.log(`Saved tags for trail with ID: ${trailId}`);
 }

@@ -83,7 +83,7 @@ export async function prepareNewTrail(
     distanceKm: Number(input.distanceKm),
     description: input.description ? sanitize(input.description) : "",
     imageUrl: input.imageUrl,
-    tagIds: input.tagIds,
+    tagIds: input.tagIds.filter((tagId) => tagId != 0),
     createdAt: Math.floor(Date.now() / 1000),
     slug,
   };
