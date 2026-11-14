@@ -7,7 +7,8 @@
     "dev": "bun --watch --check src/app.ts",
     "typecheck": "bun check",
     "start": "bun src/app.ts",
-    "db:seed": "sqlite3 db/trail-guide.db < db/seed.sql"
+    "db:seed": "sqlite3 db/trail-guide.db < db/seed.sql",
+    "start:render": "bun run db:seed && bun run start"
   },
   "keywords": [],
   "author": "",
